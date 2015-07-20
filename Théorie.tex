@@ -1,0 +1,180 @@
+\documentclass[a4paper,10pt]{article} 
+\usepackage[utf8]{inputenc} 
+\usepackage{graphicx} 
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage[english, french]{babel} 
+\usepackage{amsmath} 
+\usepackage{booktabs}
+\usepackage{fancyvrb}
+\usepackage{placeins}
+\usepackage{environ}
+\usepackage{float}
+\usepackage[T1]{fontenc}
+\numberwithin{equation}{section} 
+\numberwithin{figure}{section} 
+\numberwithin{table}{section}
+
+\graphicspath{{./figure/}}
+
+\setlength{\parskip}{5pt}
+
+\title{Fondements théoriques}
+\date{Juin 2015}
+%\today
+\author{Alex Côté}
+
+\begin{document}
+\maketitle
+
+Pour déterminer les limites théoriques du microscope à grandissement localisé, on utilise un système optique idéal où le seul élément produisant de l'aberration est celui produisant la distortion. Cet élément est modélisé comme un masque d'OPD (\emph{optical path difference}) à la surface $s$. La figure \ref{fig:geometrie} représente la géométrie utilisé pour les calculs.
+
+\section{Déviation du rayon-chef}
+
+La première étape est de déterminer l'angle de déviation $\theta_D$ qu'il est nécessaire d'appliquer au rayon-chef pour obtenir un déplacement $\Delta x = x_m - x$.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=1\textwidth]{geometrie.pdf}
+	\caption{Géométrie du microscope idéal. Le plan $u$ est la pupille et le plan $x$ l'image. Le rayon chef et les deux rayons marginaux sont représentés. En bleu les rayons non-déviés et en rouge les rayons déviés par la surface $s$. L'espace entre la pupille et l'image est unitaire et la distance entre le plan $s$ et l'image est $z$. L'angle due au tilt du rayon est donné par $\theta_t$ et l'angle de déviation par le masque d'OPD est donné par $\theta_D$.}
+	\label{fig:geometrie}
+\end{figure}
+
+De la figure \ref{fig:geometrie}, on obtient les relations suivantes pour un rayon de coordonées $(x,u)$ interceptant le plan $s$:
+
+\begin{align}
+	\theta_s &= \arctan (x-u) \\
+	s &= x - z(x-u) 	
+\end{align}
+
+En considérant une déviation de $\theta_D$, les nouveaux coordonnées du rayon au point image sont:
+
+
+\begin{align}
+	\theta_M &= \theta_s + \theta_D \\
+	x_m &= s + z\tan (\theta_m)
+\end{align}
+
+L'angle de déviation est données par:
+
+\begin{align}
+	\theta_D = \arctan\left(\frac{x_m-x}{z} + x - u\right) - \arctan(x-u)
+\end{align}
+
+Cette relation est généralisable pour l'axe $y-v$ pour obtenir l'angle de déviation $\phi_D$.
+
+\section{Profil de grandissement}
+
+Pour obtenir l'angle de déviation en tout point, il faut d'abord obtenir le changement de position du rayon chef $\Delta_x$. Trois zones sont deffinis dans le plan image: une zone de grandissement augmenté, une zone de redressement et une zone de grandissement unitaire, donc inchangée. La figure \ref{fig:grandissement_zone} montre les différents paramètres utilisés.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=0.5\textwidth]{grandissement_zone.pdf}
+	\caption{Le grandissement est centré en $c_x , c_y$, est de rayon $r_1$ et augmente la taille de l'image d'un facteur $g_1$. La zone de redressement est cocentrique mais de rayon $r_2$ et de grandissement $g_r$. Le grandissement est unitaire en dehors de ces deux zones. $d_c$ représente la distance a un point quelconque sur l'image.}
+	\label{fig:grandissement_zone}
+\end{figure}
+
+Le déplacement dans la zone de grandissement est obtenu en augmentant la distance au centre $d_c$ du facteur de grandissement $g_1$. La position en x et y avec distortion $P_x$, $P_y$ est donné par:
+
+\begin{align}
+	P_x &= g_1(x-c_x) + c_x \\
+	P_y &= g_1(y-c_y) + c_y
+\end{align}
+
+Le grandissement de redressement n'est pas constant en fonction de la distance au centre du grandissement. Il doit en effet passer d'un grandissement $g_1$ à un grandissement unitaire de manière continue pour ne pas perdre d'information. La manière d'apparier les grandissement est aux choix, il serait intéressant de développer certains critères pour minimiser la perte d'information dans cette zone dans le futur. Pour l'instant, une transition parabolique est choisie. La position du rayon chef et le profil de grandissement dans la zone de transition sont donnée par:
+
+\begin{align}
+	P_x &= g_r(x-c_x) + c_x \\
+	P_y &= g_r(y-c_y) + c_y \\
+	g_r &= (g_1 - g_2)\frac{(d_c-r_2)^2}{(r_1-r_2)^2} + g_2
+\end{align}
+
+Pour la zone extérieur, le grandissement sera typiquement unitaire. On peut tout de même formellement déffinir la position du rayon chef comme: 
+
+\begin{align}
+	P_x &= g_2(x-c_x) + c_x \\
+	P_y &= g_2(y-c_y) + c_y
+\end{align}
+
+Une simulation du déplacement du rayon-chef pour avec un redressement parabolique est présenté à la figure \ref{fig:grandissement_sim}
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=0.7\textwidth]{grandissement_sim.png}
+	\caption{Déplacement du rayon chef avec les paramètres suivant: $g_1 = 2$, $g_2 = 1$, $r_1 = 0.1$, $r_2 = 0.4$.}
+	\label{fig:grandissement_sim}
+\end{figure}
+
+\FloatBarrier
+
+\section{Calcul de la PSF}
+
+La relation de fourier entre le plan d'une lentille parfait et son plan focal est utilisé pour calculer les PSFs. Cette relation s'applique de manière générale entre le plan $u-v$ et le plan $x-y$. Si on considère uniquement la PSF provenant d'un seul angle dans la pupille, on peut étendre cette relation entre l'éventail de rayon interceptant le plan $s$ et le plan image. La PSF de base avec une intensité unitaire est données par:
+
+\begin{align}
+	PSF = \mathcal{TF}\left(e^{-2\pi i (OPD_{t})}\right)
+\end{align}
+
+En ajoutant une modification de phase induite par le plan $s$, la PSF devient:
+
+\begin{align}
+	PSF_m = \mathcal{TF}\left(e^{-2\pi i (OPD_t+OPD_s)}\right)
+\end{align}
+
+L'OPD induit par le tilt du faisceau au plan $s$ est donné par:
+
+\begin{align}
+	OPD_{tx} &= -s_x \tan{\theta_s} |_{s_{x-}}^{s_{x+}} \\
+	OPD_{ty} &= -s_y \tan{\phi_s} |_{s_{y-}}^{s_{y+}}
+\end{align}
+
+La transformée de Fourier numérique souffre d'une limitation concernant le tilt maximum. Une phase linéaire au niveau de la pupille cause un déplacement du centre de la PSF, si ce déplacement est trop important la PSF va se replier dans l'image un certain nombre de fois et l'information sur le tilt réel sera perdu. Étant donné qu'une déviation très importante du front d'onde est nécessaire pour créer un grandissement d'un facteur 2, il faut contourner ce problème.
+
+L'OPD total au niveau de la surface $s$ est décomposé en polynôme de Zernike et le piston et le tile est retiré pour ensuite recomposer le front d'onde. La déviation réelle du faisceau est également extraite des coefficients de tilt. La PSF est ainsi toujours centrée et peut être analysée plus facilement.
+
+\section{Création du masque d'OPD}
+
+Pour créer le masque d'OPD qui affectera le faisceau qui nous intéresse un ballot de rayon chef est lancé vers $s$. Ce ballot est dévié par le profil de grandissement calculé précédement tel qu'illustré sur la figure \ref{fig:rayon_chef}. 
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=0.7\textwidth]{rayon_chef.pdf}
+	\caption{Ballot de rayon chef lancé sur la surface $s$ et leur point d'arrivé non modifié par $s$ en bleu et modifié en rouge.}
+	\label{fig:rayon_chef}
+\end{figure}
+
+La tangente de l'angle obtenu pour chaque point de $s$ représente la dérivée partielle de l'OPD en ce point. On reconstruit l'OPD en utilisant un gradient inverse.
+
+\begin{align}
+	\frac{\partial OPD}{\partial x} &= \tan(\theta_D) \\
+	\frac{\partial OPD}{\partial y} &= \tan(\phi_D)
+\end{align}
+
+\section{Métriques de performance}
+
+Trois méthodes sont utilisée pour estimer la qualité d'image: l'erreur RMS du front d'onde, le ratio de Strehl et les coefficient de Zernike.
+
+L'erreur RMS est calculé à partir du front d'onde sans piston et tilt avec la formule suivante:
+
+\begin{align}
+	E_{RMS} = \sqrt{\int_S (OPD_{total} - OPD_{piston} - OPD_{tilt})^2 \mathcal{d}S}
+\end{align}
+
+Le ratio de Strehl est calculé avec sa deffinition par transformé de Fourier: l'intensité du premier élément de la transformée de Fourier discrète normalisé par l'intensité totale de la pupille.
+
+Les coefficient de Zernike utilise une décomposition disponible librement préparé par Carey Smith. Les coefficients de tilts sont utilisé pour estimer la position réelle de la PSF sur l'image. Le coefficient de defocus sera utilisé pour estimer la position de meilleur foyer.
+
+\section{Résultats}
+
+La simulation utilise un grandissement avec les mêmes paramêtres que la figure \ref{fig:grandissement_zone}. La surface $s$ est placé à $z = 0.05$ et le faisceau est $f/10$. Ces paramètres imitent une surface placé proche du plan image intermédiaire d'un microscope optique standard.
+
+Les simulations sont en pièce jointe. Le tilt résiduel est du au nombre de point utilisé pour le calculé et est égal en moyenne à une demi divisé par le nombre de point. De manière préliminaire, la détérioration de la PSF semble raisonnable pour un grandissement d'un facteur deux.
+
+Il faudra une analyse plus poussée sur les points suivants:
+\begin{itemize}
+	\item Quantification de la déterioration (Strehl ratio, RMS spot size)
+	\item Analyse du défocus (distance de déplacement du foyer)
+	\item Paramètres de simulation réaliste (f/\#, courbure maximale de $s$)
+\end{itemize}
+
+\end{document}
