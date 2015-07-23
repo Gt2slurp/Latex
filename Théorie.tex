@@ -59,6 +59,7 @@ L'angle de déviation est données par:
 
 \begin{align}
 	\theta_D = \arctan\left(\frac{x_m-x}{z} + x - u\right) - \arctan(x-u)
+	\label{eq:thetaD}
 \end{align}
 
 Cette relation est généralisable pour l'axe $y-v$ pour obtenir l'angle de déviation $\phi_D$.
@@ -146,7 +147,8 @@ Pour créer le masque d'OPD qui affectera le faisceau qui nous intéresse un bal
 La tangente de l'angle obtenu pour chaque point de $s$ représente la dérivée partielle de l'OPD en ce point. On reconstruit l'OPD en utilisant un gradient inverse.
 
 \begin{align}
-	\frac{\partial OPD}{\partial x} &= \tan(\theta_D) \\
+	\frac{\partial OPD}{\partial x} &= \tan(\theta_D) 
+	\label{eq:dopddx}\\
 	\frac{\partial OPD}{\partial y} &= \tan(\phi_D)
 \end{align}
 
@@ -157,24 +159,62 @@ Trois méthodes sont utilisée pour estimer la qualité d'image: l'erreur RMS du
 L'erreur RMS est calculé à partir du front d'onde sans piston et tilt avec la formule suivante:
 
 \begin{align}
-	E_{RMS} = \sqrt{\int_S (OPD_{total} - OPD_{piston} - OPD_{tilt})^2 \mathcal{d}S}
+	E_{RMS} = \sqrt{\int_S (OPD_{total} - OPD_{piston} - OPD_{tilt})^2 dS}
 \end{align}
 
 Le ratio de Strehl est calculé avec sa deffinition par transformé de Fourier: l'intensité du premier élément de la transformée de Fourier discrète normalisé par l'intensité totale de la pupille.
 
 Les coefficient de Zernike utilise une décomposition disponible librement préparé par Carey Smith. Les coefficients de tilts sont utilisé pour estimer la position réelle de la PSF sur l'image. Le coefficient de defocus sera utilisé pour estimer la position de meilleur foyer.
 
-\section{Résultats}
+\section{Modèle analytique du front de phase}
 
-La simulation utilise un grandissement avec les mêmes paramêtres que la figure \ref{fig:grandissement_zone}. La surface $s$ est placé à $z = 0.05$ et le faisceau est $f/10$. Ces paramètres imitent une surface placé proche du plan image intermédiaire d'un microscope optique standard.
+On peut trouver la dépendance du front d'onde $W(s)$ au niveau de la surface $s$ en combinant les équation \ref{eq:thetaD} et \ref{eq:dopddx}. On trace les rayon-chefs interceptant la surface $s$ et $r$ exprimé en coordonné radial.
 
-Les simulations sont en pièce jointe. Le tilt résiduel est du au nombre de point utilisé pour le calculé et est égal en moyenne à une demi divisé par le nombre de point. De manière préliminaire, la détérioration de la PSF semble raisonnable pour un grandissement d'un facteur deux.
+\begin{align}
+	\frac{\partial W(s)}{\partial s} = \tan(\arctan\left(\frac{\Delta(r)}{z} + r\right) - \arctan(r))
+\end{align}
 
-Il faudra une analyse plus poussée sur les points suivants:
-\begin{itemize}
-	\item Quantification de la déterioration (Strehl ratio, RMS spot size)
-	\item Analyse du défocus (distance de déplacement du foyer)
-	\item Paramètres de simulation réaliste (f/\#, courbure maximale de $s$)
-\end{itemize}
+En appliquant le changement de variable suivant:
+
+\begin{align}
+	s &= r(1-z) \\
+	\frac{\partial s}{\partial r} &= (1-z)
+\end{align}
+
+On obtient la relation en fonction uniquement de $s$.
+
+\begin{align}
+	\frac{\partial W(s)}{\partial s} = \int \tan\left[\arctan\left(\frac{\Delta(\frac{s}{1-z})}{z} + \frac{s}{1-z}\right) - \arctan\left(\frac{s}{1-z}\right)\right] ds
+\end{align}
+
+En approximation la tangente et l'arcgente comme linéaire, la relation se réduit à :
+
+\begin{align}
+	\frac{\partial W(s)}{\partial s} &= \frac{1}{z} \Delta\left(\frac{s}{1-z}\right) \\
+	W(s) &= \frac{1}{z} \int \Delta\left(\frac{s}{1-z}\right) ds
+\end{align}
+
+Au premier ordre, le front d'onde produit par la surface $s$ est l'intégrale du déplacement des rayon mis à l'échelle par la distance $z$.
+
+\subsection{Grandissement gaussien}
+
+En utilisant un grandissement gaussien de la forme suivante:
+
+\begin{align}
+	G(r) = g_1e^{-(\frac{r}{\sigma})^2} + g_2
+\end{align}
+
+La relation entre le grandissement et le déplacement de la position des rayon chef est:
+
+\begin{align}
+	\Delta(r) = r(G(r)-1)
+\end{align}
+
+Si $g_2 = 1$, ce qui est le cas si la partie extérieure de l'image n'est pas modifiée, le front d'onde intégré est:
+
+\begin{align}
+	W(s) = -g_1\frac{\sigma^2}{2}e^{-\left(\frac{s}{\sigma(1-z)}\right)^2}
+\end{align}
+
 
 \end{document}
